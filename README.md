@@ -60,7 +60,7 @@ At this point the external IP is pending and not available. This is because Mini
     NAME                      TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)        AGE
     load-balancing-test-app   LoadBalancer   10.96.65.215   10.96.65.215   80:30793/TCP   88s
 
-The external IP has now been resolved and curl can be used to to connect to the application pods via the load balancer service.
+The external IP has now been resolved and curl can be used to connect to the application pods via the load balancer service.
 
     $ curl 10.96.65.215
     App id: 562704180445
