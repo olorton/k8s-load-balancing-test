@@ -96,6 +96,14 @@ Verify the connection to the NodeJS app container using this new domain:
 
 ## Verifying the Load Balancer works as expected
 
+There are three different ways to verify that the load is being distributed over the different pods, as expected:
+
+- Verifying the service is correctly configured
+- Verifying the pods are returning different IDs in their responses
+- Verifying the pods are logging different IDs
+
+### Verifying the service is correctly configured
+
 Verify that the K8s Load Balancer service is set up and configured using the `kubectl describe` command:
 
     $ kubectl describe service load-balancing-test-app -n lb-test
@@ -129,6 +137,8 @@ These lines could be described in English as: There is a load balancer service, 
 
 The line `External Traffic Policy:  Cluster` is interesting because this describes the traffic as being _evenly distributed_ between each endpoint within the cluster (default behavior).
 
+### Verifying the pods are returning different IDs in their responses
+
 You will remember that each application pod returns a unique ID when that page is requested over http. Curl can be run in a loop to verify that the traffic is being evenly distributed.
 
     $ for i in {1..20}; do echo "$(curl -s lb-test.dev)"; done
@@ -152,6 +162,35 @@ You will remember that each application pod returns a unique ID when that page i
     App id: 767595446753
     App id: 767595446753
     App id: 368797613483
+
+### Verifying the pods are logging different IDs
+
+    $ kubectl logs -l app=load-balancing-test-app -n lb-test
+
+    listening on 3000, app id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    listening on 3000, app id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+
+### Verifying these checks still apply when scaling up
 
 Kubernetes is a valuable tool because it is often necessary to scale up/down resources to meet changing demands. By adding another pod and re-running these verifications it is possible to verify that the load balancer continues to spread the traffic over all all of it's pods. To do this, first modify `deployment.yaml` so that `spec.replicas` is changed from 2 to 3, and re-apply the config:
 
@@ -210,3 +249,39 @@ Verify that the curl loop now returns three different app ids, rather than just 
     App id: 767595446753
     App id: 368797613483
     App id: 368797613483
+
+
+And that the logs show three different IDs:
+
+    $ kubectl logs -l app=load-balancing-test-app -n lb-test
+
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 767595446753
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 368797613483
+    App id: 245752426860
+    App id: 245752426860
+    App id: 245752426860
+    App id: 245752426860
+    App id: 245752426860
+    App id: 245752426860
+    App id: 245752426860
+    App id: 245752426860
+    App id: 245752426860
+    App id: 245752426860

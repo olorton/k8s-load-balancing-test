@@ -7,5 +7,6 @@ app.listen(3000, function () {
 });
 
 app.get("/", (req, res) => {
+  console.log("App id: " + rand_id);
   res.send("App id: " + rand_id);
 });
