@@ -1,6 +1,6 @@
-# Load balancer test (Minikube)
+# Kubernetes load balancing test
 
-This repository contains sample code & config for setting up and running a basic test of load balancing within K8s on Minikube. Parts of this document are verbose as I am re-familiarizing myself with K8s after too many years of not using it.
+In this post I will run through the steps to build a basic Kubernetes deployment that allows me to verify that the load balancer is balancing traffic between pods in an roughly even manner. Parts of this document are verbose as I am re-familiarizing myself with K8s after too many years of not using it.
 
 ### Sources
 
@@ -11,7 +11,7 @@ This repository contains sample code & config for setting up and running a basic
 
 A basic NodeJS app has been created, which on startup creates a unique ID and returns that ID on every subsequent http request. This will be used later for verifying that the pods are evenly load balanced.
 
-The code for this is here: [/app/index.js](/app/index.js)
+The code for this is here: [index.js](https://github.com/olorton/k8s-load-balancing-test/blob/main/app/index.js)
 
 The container for this is on [Docker Hub](https://hub.docker.com/r/olorton/load-balancing-test-app)
 
@@ -27,7 +27,7 @@ Create a namespace for our project:
 
 ### Pods
 
-Config file: [/deployment.yaml](/deployment.yaml)
+Config file: [https://github.com/olorton/k8s-load-balancing-test/blob/main/deployment.yaml](/deployment.yaml)
 
 To start with, a replica of two pods containing our NodeJS app have been configured. Having at least two pods is necessary to verify that the load balancer is balancing the traffic at a later step. The container port 3000 is exposed so that the app can receive connection from within the cluster.
 
@@ -42,7 +42,7 @@ Verify that these two pods have started:
 
 ### Service (Load balancer)
 
-Config file: [/service.yaml](/service.yaml)
+Config file: [https://github.com/olorton/k8s-load-balancing-test/blob/main/service.yaml](/service.yaml)
 
 This creates a new service, a load balancer, which balances traffic from port 80 to port 3000 of all pods labeled `load-balancing-test-app`.
 
@@ -67,7 +67,7 @@ The external IP has now been resolved and curl can be used to connect to the app
 
 ### Ingress
 
-Config file: [/ingress.yaml](/ingress.yaml)
+Config file: [https://github.com/olorton/k8s-load-balancing-test/blob/main/ingress.yaml](/ingress.yaml)
 
 By creating the pods and a load balancer service, there are now enough components to complete this K8s build and verify the load balancer service works as expected. However, this can be improved by using an ingress so that the app can be accessed using a domain name rather than an IP address.
 
@@ -164,6 +164,8 @@ You will remember that each application pod returns a unique ID when that page i
     App id: 368797613483
 
 ### Verifying the pods are logging different IDs
+
+There should also be IDs logged after each http request:
 
     $ kubectl logs -l app=load-balancing-test-app -n lb-test
 
